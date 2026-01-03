@@ -168,7 +168,7 @@ local function SecurityCheck(loginData)
     for _, account in pairs(accounts) do
         if account.Username == inputUsername and account.Password == inputPassword then
             accountFound = true
-            accountActive = account.IsActive == true
+            accountActive = true
             break
         end
     end
