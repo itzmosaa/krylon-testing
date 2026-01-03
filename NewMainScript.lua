@@ -18,8 +18,7 @@ end
 
 local encryptedRepo = "aXR6bW9zYWE="
 local encryptedRepoName = "a3J5bG9uLXRlc3Rpbmc="
-local encryptedAccountUrl = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2l0em1vc2FhL2tyeWxvbi13aGl0ZWxpc3RzL3JlZnMvaGVhZHMvbWFpbi9BY2NvdW50U3lzdGVtLmx1YQ=="
-
+local encryptedAccountUrl = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2l0em1vc2FhL2tyeWxvbi13aGl0ZWxpc3RzL21haW4vQWNjb3VudFN5c3RlbS5sdWE="
 
 local EXPECTED_REPO_OWNER = decodeBase64(encryptedRepo)
 local EXPECTED_REPO_NAME = decodeBase64(encryptedRepoName)
