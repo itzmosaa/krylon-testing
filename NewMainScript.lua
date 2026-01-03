@@ -152,48 +152,10 @@ local function SecurityCheck(loginData)
     end
     
     clearSecurityFolderIfDifferent(inputUsername)
-    
-    local accounts = fetchAccounts()
-    if not accounts then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Connection Error",
-            Text = "failed to check if its yo account check your wifi it might be shitty. dm aero",
-            Duration = 3
-        })
-        return false
-    end
-    
-    local accountFound = false
-    local accountActive = false
-    for _, account in pairs(accounts) do
-        if account.Username == inputUsername and account.Password == inputPassword then
-            accountFound = true
-            accountActive = true
-            break
-        end
-    end
-    
-    if not accountFound then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Access Denied",
-            Text = "wrong info dm 5qvx for access",
-            Duration = 3
-        })
-        return false
-    end
-    
-    if not accountActive then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Account Inactive",
-            Text = "Your account is currently inactive.",
-            Duration = 3
-        })
-        return false
-    end
-    
+
+    -- Skip remote account verification and accept provided credentials.
     local repoInfo = getRepoInfo()
     createValidationFile(inputUsername, repoInfo)
-    
     return true
 end
 
