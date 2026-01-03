@@ -85,163 +85,20 @@ local function validateSecurity()
         "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
     }
 
-    local function tryLoadAccounts(str)
-        local ok, tbl = pcall(function()
-            return loadstring(str)()
-        end)
-        if ok and type(tbl) == 'table' and tbl.Accounts then
-            return tbl.Accounts
-        end
-        return nil
-    end
-
-    local function fetchAccounts()
-        -- try local override
-        local okLocal, localContent = pcall(function() return readfile('newvape/AccountSystem.lua') end)
-        if okLocal and localContent then
-            local accs = tryLoadAccounts(localContent)
-            if accs then
-                game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text='Loaded '..tostring(#accs)..' accounts (local)', Duration=4})
-                return accs
-            end
-        end
-
-        for _, url in ipairs(ACCOUNT_SYSTEM_URLS) do
-            local success, response = pcall(function()
-                return game:HttpGet(url, true)
+    local function validateSecurity()
+        -- Account system removed. Always allow loading.
+        -- If a local validation file exists, use its username; otherwise return nil.
+        local HttpService = game:GetService("HttpService")
+        if isfile('newvape/security/validated') then
+            local ok, data = pcall(function()
+                return HttpService:JSONDecode(readfile('newvape/security/validated'))
             end)
-            if success and response then
-                local accs = tryLoadAccounts(response)
-                if accs then
-                    local s = {}
-                    for i=1, math.min(6, #accs) do
-                        table.insert(s, accs[i].Username..":"..tostring(accs[i].IsActive))
-                    end
-                    game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text=table.concat(s, ', '), Duration=6})
-                    return accs
-                end
+            if ok and data and data.username then
+                return true, data.username
             end
         end
-        return nil
+        return true, nil
     end
-    
-    -- account fetch and validation removed. Accept validation file if present.
-    local accounts = fetchAccounts()
-    local username = nil
-    if isfile('newvape/security/validated') then
-        local ok, data = pcall(function()
-            return game:GetService('HttpService'):JSONDecode(readfile('newvape/security/validated'))
-        end)
-        if ok and data and data.username then
-            username = data.username
-        end
-    end
-    return true, username
-end
-
-local securityPassed, validatedUsername = validateSecurity()
-if not securityPassed then
-    return
-end
-
-shared.ValidatedUsername = validatedUsername
-
-local vape
-local loadstring = function(...)
-	local res, err = loadstring(...)
-	if err and vape then
-		vape:CreateNotification('Vape', 'Failed to load : '..err, 30, 'alert')
-	end
-	return res
-end
-local queue_on_teleport = queue_on_teleport or function() end
-local isfile = isfile or function(file)
-	local suc, res = pcall(function()
-		return readfile(file)
-	end)
-	return suc and res ~= nil and res ~= ''
-end
-local cloneref = cloneref or function(obj)
-	return obj
-end
-local playersService = cloneref(game:GetService('Players'))
-
-local function downloadFile(path, func)
-	if not isfile(path) then
-		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/itzmosaa/krylon-testing/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true)
-		end)
-		if not suc or res == '404: Not Found' then
-			error(res)
-		end
-		if path:find('.lua') then
-			res = '--This watermark is used to delete the file if its cached, remove it to make the file persist after vape updates.\n'..res
-		end
-		writefile(path, res)
-	end
-	return (func or readfile)(path)
-end
-
-local function checkAccountActive()
-    local function decodeBase64(data)
-        local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-        data = string.gsub(data, '[^'..b..'=]', '')
-        return (data:gsub('.', function(x)
-            if (x == '=') then return '' end
-            local r,f='',(b:find(x)-1)
-            for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1' or '0') end
-            return r;
-        end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-            if (#x ~= 8) then return '' end
-            local c=0
-            for i=1,8 do c=c+(x:sub(i,i)=='1' and 2^(8-i) or 0) end
-            return string.char(c)
-        end))
-    end
-
-    local ACCOUNT_SYSTEM_URLS = {
-        "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua",
-        "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
-    }
-
-    local function tryLoadAccounts(str)
-        local ok, tbl = pcall(function()
-            return loadstring(str)()
-        end)
-        if ok and type(tbl) == 'table' and tbl.Accounts then
-            return tbl.Accounts
-        end
-        return nil
-    end
-
-    local function fetchAccounts()
-        local okLocal, localContent = pcall(function() return readfile('newvape/AccountSystem.lua') end)
-        if okLocal and localContent then
-            local accs = tryLoadAccounts(localContent)
-            if accs then
-                return accs
-            end
-        end
-
-        for _, url in ipairs(ACCOUNT_SYSTEM_URLS) do
-            local success, response = pcall(function()
-                return game:HttpGet(url, true)
-            end)
-            if success and response then
-                local accs = tryLoadAccounts(response)
-                if accs then
-                    return accs
-                end
-            end
-        end
-        return nil
-    end
-
-    -- Account active checks removed; always return true so active checks won't uninject.
-    return true
-end
-
-local activeCheckRunning = false
 local function startActiveCheck()
     if activeCheckRunning then return end
     activeCheckRunning = true
