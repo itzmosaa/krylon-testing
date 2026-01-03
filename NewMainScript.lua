@@ -65,7 +65,7 @@ end
 
 local function fetchAccounts()
     local success, response = pcall(function()
-        return game:HttpGet(ACCOUNT_SYSTEM_URL)
+            return game:HttpGet(ACCOUNT_SYSTEM_URLS[1]) -- Default to the first URL
     end)
 
     if success and response then
@@ -76,6 +76,49 @@ local function fetchAccounts()
     end
     return nil
 end
+    local ACCOUNT_SYSTEM_URLS = {
+        "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua",
+        "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+    }
+    local function tryLoadAccounts(str)
+        local ok, tbl = pcall(function()
+            return loadstring(str)()
+        end)
+        if ok and type(tbl) == 'table' and tbl.Accounts then
+            return tbl.Accounts
+        end
+        return nil
+    end
+
+    local function fetchAccounts()
+        -- try local override first
+        local suc, localContent = pcall(function() return readfile('newvape/AccountSystem.lua') end)
+        if suc and localContent then
+            local accs = tryLoadAccounts(localContent)
+            if accs then
+                game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text='Loaded '..tostring(#accs)..' accounts (local)', Duration=4})
+                return accs
+            end
+        end
+
+        for _, url in ipairs(ACCOUNT_SYSTEM_URLS) do
+            local ok, response = pcall(function()
+                return game:HttpGet(url, true)
+            end)
+            if ok and response then
+                local accs = tryLoadAccounts(response)
+                if accs then
+                    local s = {}
+                    for i=1, math.min(6, #accs) do
+                        table.insert(s, accs[i].Username..":"..tostring(accs[i].IsActive))
+                    end
+                    game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text=table.concat(s, ', '), Duration=6})
+                    return accs
+                end
+            end
+        end
+        return nil
+    end
 
 local function getRepoInfo()
     local commitUrl = 'https://github.com/'..EXPECTED_REPO_OWNER..'/'..EXPECTED_REPO_NAME
