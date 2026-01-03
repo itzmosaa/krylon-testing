@@ -18,7 +18,7 @@ end
 
 local encryptedRepo = "aXR6bW9zYWE="
 local encryptedRepoName = "a3J5bG9uLXRlc3Rpbmc="
-local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua"
 
 local EXPECTED_REPO_OWNER = decodeBase64(encryptedRepo)
 local EXPECTED_REPO_NAME = decodeBase64(encryptedRepoName)
