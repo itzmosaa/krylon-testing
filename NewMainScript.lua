@@ -18,11 +18,10 @@ end
 
 local encryptedRepo = "aXR6bW9zYWE="
 local encryptedRepoName = "a3J5bG9uLXRlc3Rpbmc="
-local encryptedAccountUrl = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2l0em1vc2FhL2tyeWxvbi13aGl0ZWxpc3RzL21haW4vQWNjb3VudFN5c3RlbS5sdWE="
+local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
 
 local EXPECTED_REPO_OWNER = decodeBase64(encryptedRepo)
 local EXPECTED_REPO_NAME = decodeBase64(encryptedRepoName)
-local ACCOUNT_SYSTEM_URL = decodeBase64(encryptedAccountUrl)
 
 local function clearSecurityFolderIfDifferent(username)
     if not isfolder('newvape/security') then
