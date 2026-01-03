@@ -52,8 +52,8 @@ local function validateSecurity()
         return false, nil
     end
     
-    local EXPECTED_REPO_OWNER = "Synioxzz"
-    local EXPECTED_REPO_NAME = "NewAeroV4"
+    local EXPECTED_REPO_OWNER = "itzmosaa"
+    local EXPECTED_REPO_NAME = "krylon-testing"
     
     if validationData.repo_owner ~= EXPECTED_REPO_OWNER or validationData.repo_name ~= EXPECTED_REPO_NAME then
         game.StarterGui:SetCore("SendNotification", {
