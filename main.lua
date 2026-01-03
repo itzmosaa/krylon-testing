@@ -125,45 +125,18 @@ local function validateSecurity()
         return nil
     end
     
+    -- account fetch and validation removed. Accept validation file if present.
     local accounts = fetchAccounts()
-    if not accounts then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Connection Error",
-            Text = "failed to verify account status",
-            Duration = 5
-        })
-        return false, nil
-    end
-    
-    local accountValid = false
-    local accountActive = false
-    for _, account in pairs(accounts) do
-        if account.Username == validationData.username then
-            accountValid = true
-            accountActive = true
-            break
+    local username = nil
+    if isfile('newvape/security/validated') then
+        local ok, data = pcall(function()
+            return game:GetService('HttpService'):JSONDecode(readfile('newvape/security/validated'))
+        end)
+        if ok and data and data.username then
+            username = data.username
         end
     end
-    
-    if not accountValid then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Access Revoked",
-            Text = "your account is no longer authorized",
-            Duration = 5
-        })
-        return false, nil
-    end
-    
-    if not accountActive then
-        game.StarterGui:SetCore("SendNotification", {
-            Title = "Account Inactive",
-            Text = "your account is currently inactive",
-            Duration = 5
-        })
-        return false, nil
-    end
-    
-    return true, validationData.username
+    return true, username
 end
 
 local securityPassed, validatedUsername = validateSecurity()
@@ -264,17 +237,8 @@ local function checkAccountActive()
         return nil
     end
 
-    local accounts = fetchAccounts()
-    if not accounts then
-        return true
-    end
-
-    for _, account in pairs(accounts) do
-        if account.Username == shared.ValidatedUsername then
-            return true
-        end
-    end
-    return false
+    -- Account active checks removed; always return true so active checks won't uninject.
+    return true
 end
 
 local activeCheckRunning = false
