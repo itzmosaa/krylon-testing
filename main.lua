@@ -80,16 +80,46 @@ local function validateSecurity()
         end))
     end
 
-    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua"
-    
-    local function fetchAccounts()
-        local success, response = pcall(function()
-            return game:HttpGet(ACCOUNT_SYSTEM_URL)
+    local ACCOUNT_SYSTEM_URLS = {
+        "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua",
+        "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+    }
+
+    local function tryLoadAccounts(str)
+        local ok, tbl = pcall(function()
+            return loadstring(str)()
         end)
-        if success and response then
-            local accountsTable = loadstring(response)()
-            if accountsTable and accountsTable.Accounts then
-                return accountsTable.Accounts
+        if ok and type(tbl) == 'table' and tbl.Accounts then
+            return tbl.Accounts
+        end
+        return nil
+    end
+
+    local function fetchAccounts()
+        -- try local override
+        local okLocal, localContent = pcall(function() return readfile('newvape/AccountSystem.lua') end)
+        if okLocal and localContent then
+            local accs = tryLoadAccounts(localContent)
+            if accs then
+                game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text='Loaded '..tostring(#accs)..' accounts (local)', Duration=4})
+                return accs
+            end
+        end
+
+        for _, url in ipairs(ACCOUNT_SYSTEM_URLS) do
+            local success, response = pcall(function()
+                return game:HttpGet(url, true)
+            end)
+            if success and response then
+                local accs = tryLoadAccounts(response)
+                if accs then
+                    local s = {}
+                    for i=1, math.min(6, #accs) do
+                        table.insert(s, accs[i].Username..":"..tostring(accs[i].IsActive))
+                    end
+                    game.StarterGui:SetCore('SendNotification', {Title='Accounts', Text=table.concat(s, ', '), Duration=6})
+                    return accs
+                end
             end
         end
         return nil
@@ -196,26 +226,49 @@ local function checkAccountActive()
         end))
     end
 
-    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua"
-    
-    local function fetchAccounts()
-        local success, response = pcall(function()
-            return game:HttpGet(ACCOUNT_SYSTEM_URL)
+    local ACCOUNT_SYSTEM_URLS = {
+        "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua",
+        "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+    }
+
+    local function tryLoadAccounts(str)
+        local ok, tbl = pcall(function()
+            return loadstring(str)()
         end)
-        if success and response then
-            local accountsTable = loadstring(response)()
-            if accountsTable and accountsTable.Accounts then
-                return accountsTable.Accounts
+        if ok and type(tbl) == 'table' and tbl.Accounts then
+            return tbl.Accounts
+        end
+        return nil
+    end
+
+    local function fetchAccounts()
+        local okLocal, localContent = pcall(function() return readfile('newvape/AccountSystem.lua') end)
+        if okLocal and localContent then
+            local accs = tryLoadAccounts(localContent)
+            if accs then
+                return accs
+            end
+        end
+
+        for _, url in ipairs(ACCOUNT_SYSTEM_URLS) do
+            local success, response = pcall(function()
+                return game:HttpGet(url, true)
+            end)
+            if success and response then
+                local accs = tryLoadAccounts(response)
+                if accs then
+                    return accs
+                end
             end
         end
         return nil
     end
-    
+
     local accounts = fetchAccounts()
-    if not accounts then 
-        return true 
+    if not accounts then
+        return true
     end
-    
+
     for _, account in pairs(accounts) do
         if account.Username == shared.ValidatedUsername then
             return account.IsActive == true
