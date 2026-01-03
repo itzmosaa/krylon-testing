@@ -80,7 +80,7 @@ local function validateSecurity()
         end))
     end
 
-    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua"
     
     local function fetchAccounts()
         local success, response = pcall(function()
@@ -196,7 +196,7 @@ local function checkAccountActive()
         end))
     end
 
-    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-whitelists/main/AccountSystem.lua"
+    local ACCOUNT_SYSTEM_URL = "https://raw.githubusercontent.com/itzmosaa/krylon-testing/main/AccountSystem.lua"
     
     local function fetchAccounts()
         local success, response = pcall(function()
